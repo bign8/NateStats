@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./node_modules/forever/bin/forever \
+	start -a \
+	-l ./forever.log \
+	-o ./out.log \
+	-e ./err.log \
+	server.js

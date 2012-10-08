@@ -1,0 +1,33 @@
+-- session_view
+
+SELECT A.*, B.`sCityName`, C.`sRegionName`, D.`sCountryName`, E.`sGeoLat`, E.`sGeoLong`, F.`sBroMinValue`, G.`sBroMajValue`, H.`sBrowserName`, I.`sPlatVerValue`, J.`sPlatformName`, J.`sPlatformDesc`, K.`sDevName`, L.`sDevMakerName`, M.`sRendVerValue`, N.`sRenderName`  FROM `session` A
+INNER JOIN `s_city` B ON B.`sCityID` = A.`sCityID`
+INNER JOIN `s_region` C ON C.`sRegionID` = B.`sRegionID`
+INNER JOIN `s_country` D ON D.`sCountryID` = C.`sCountryID`
+INNER JOIN `s_geo` E ON E.`sGeoID` = A.`sGeoID`
+INNER JOIN `s_bro_min` F ON F.`sBroMinID` = A.`sBroMinID`
+INNER JOIN `s_bro_maj` G ON G.`sBroMajID` = F.`sBromajID`
+INNER JOIN `s_browser` H ON H.`sBrowserID` = G.`sBrowserID`
+INNER JOIN `s_plat_ver` I ON I.`sPlatVerID` = A.`sPlatVerID`
+INNER JOIN `s_platform` J ON J.`sPlatformID` = I.`sPlatformID`
+INNER JOIN `s_dev_name` K ON K.`sDevNameID` = A.`sDevNameID`
+INNER JOIN `s_dev_maker` L ON L.`sDevMakerID` = K.`sDevMakerID`
+INNER JOIN `s_rend_ver` M ON M.`sRendVerID` = A.`sRendVerID`
+INNER JOIN `s_render` N ON N.`sRenderID` = M.`sRenderID`
+
+
+-- interesting view of live-ish actions (session_action_join)
+SELECT s.sIpID, a.*, cur.`aPage`
+FROM `session` s, `action` a, `a_page` cur
+WHERE s.`sessionID` = a.`sessionID` AND cur.`apageID` = a.`aPageID`
+ORDER BY a.`actionStart`
+
+-- session_recent
+SELECT * from `session` where (`sessionStamp` > (now() - interval 2 minute))
+
+-- session_ip_count
+SELECT sessionIP, count(*) AS count FROM session GROUP BY sessionIP ORDER BY count DESC
+
+-- session_wo_action_browser
+SELECT count(*) AS count,CONCAT(b.sBrowserName,' ',ma.sBroMajValue,'.',mi.sBroMinValue) AS browser FROM s_bro_min mi,s_bro_maj ma,s_browser b,session s LEFT JOIN action a ON a.sessionID=s.sessionID WHERE a.sessionID IS NULL AND mi.sBroMinID=s.sBroMinID AND mi.sBroMajID=ma.sBroMajID AND ma.sBrowserID=b.sBrowserID GROUP BY s.sBroMinID
+
