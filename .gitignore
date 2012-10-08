@@ -12,8 +12,4 @@ logs
 results
 
 node_modules
-<<<<<<< HEAD
 npm-debug.log
-=======
-npm-debug.log
->>>>>>> 03b8c1c4acfd5dc1ef4a2cea1674e16363901719
