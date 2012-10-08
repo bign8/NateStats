@@ -1,16 +1,10 @@
-window.onload = function(){
-	
-};
-
 // http://stackoverflow.com/a/950146
 var head = document.getElementsByTagName('head')[0];
 var script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = 'http://a.h1x.com:1337/socket.io/socket.io.js';
-
 script.onreadystatechange = startStats;
 script.onload = startStats;
-
 head.appendChild(script);
 
 // ---- main process function ----
@@ -36,9 +30,9 @@ function startStats() {
 	
 	// new session created
 	socket.on('retSession', function(data){
-		//console.log(data);
 		setCookie('_sessionHash', data.hash);
-		
+		//localStorage._sessionHash = data.hash;
+		//sessionStorage._sessionHash = data.hash;
 		sendInfo();
 	});
 	
@@ -46,7 +40,8 @@ function startStats() {
 		// generate data here
 		socket.emit('info', { 
 			title: document.title,
-			ref: document.referrer,
+			ref: document.referrer, // check exists and is not empty
+			// combine the following and make db sort it out - document.location.href;
 			loc: window.location.pathname,
 			orig: window.location.origin
 		});

@@ -39,12 +39,28 @@ var stats = io.of('/stats');
 // handle the viewing stats server
 admin.on('connection', function (socket) {
 	// database get stuff here
+	
+	socket.on('getInfo', function (data) {
+		switch (data.idType) {
+			case 'pageID':
+				mysql.query("SELECT `aPage` FROM `a_page` WHERE `aPageID` = ?;", [data.id], function(err, rows) {
+					if (err) throw err;
+					data.value = rows[0].aPage;
+					socket.emit('getInfoResult', data);
+				});
+				
+				break;
+			case 'extRefID':
+				break;
+			case 'Something else':
+				break;
+		}
+	});
 });
 
 // handle the stats server
 stats.on('connection', function (socket) { // io.sockets
-	admin.emit('num', stats.clients().length);
-
+	
 	// TODO : dive deeper into this error
 	if (typeof(socket.handshake) === 'undefined' || socket.handshake.headers.referer == undefined) {
 		consoleMsg('header problem');
@@ -52,6 +68,7 @@ stats.on('connection', function (socket) { // io.sockets
 		socket.disconnect('header problem');
 		return;
 	}
+	admin.emit('num', stats.clients().length);
 	
 	var newOrigin = socket.handshake.headers.referer.replace(/^https?:\/\//,''); // remove http(s)
 	newOrigin = newOrigin.substring(0, newOrigin.indexOf('/')); // remove everything trailing the last /
@@ -128,6 +145,8 @@ function fnStartStatsSocket(socket, domainID) {
 						
 						throw new Error("Something is undefined here");
 					}//*/
+					
+					admin.emit('infoResult', rows[0]);
 					
 					socket.set('actionID', rows[0].actionID);
 				}
