@@ -111,6 +111,8 @@ function fnStartStatsSocket(socket, domainID) {
 	});
 	
 	// TODO : parse the origional page info data
+	// TODO : handle external reference better
+	// TODO : handle nulls for external reference better
 	socket.on('info', function (cbData) {
 		admin.emit('test', cbData);
 		
@@ -118,6 +120,9 @@ function fnStartStatsSocket(socket, domainID) {
 		var newReferer = cbData.ref;
 		var same_domain = (cbData.ref.indexOf(cbData.orig) === 0);
 		if (same_domain) newReferer = newReferer.substring(cbData.orig.length); // same domain
+		
+		// same domain regular expression, use once domain is known
+		//SELECT * FROM `a_ref` WHERE `aRef` REGEXP '^http://[^/]*carroll.edu.*$'
 		
 		socket.get('sessionID', function(err, sessionID){
 			var fix = mysql.query("CALL action_insert(?, ?, ?, ?);",
@@ -156,7 +161,7 @@ function fnStartStatsSocket(socket, domainID) {
 	
 	// set end of page view time
 	socket.on('disconnect', function () {
-		admin.emit('num', stats.clients().length);
+		admin.emit('num', stats.clients().length); // Object.keys(stats.sockets).length
 		
 		socket.get('actionID', function(err, actionID){
 			if (err) {console.log(err); throw err;}
@@ -237,9 +242,11 @@ function genServer(req, res) {
 	fs.readFile(path, function (err, data) {
 		if (err) {
 			if (err.errno = 34) {
+				consoleMsg('404 error - ' + file);
 				res.writeHead(404, {"Content-Type": "text/plain"});
 				return res.end("404 Not Found\n");
 			} else {
+				consoleMsg('500 error - ' + file + ' ' + err);
 				res.writeHead(500, {"Content-Type": "text/plain"});
 				return res.end('Error loading ' + file);
 			}
