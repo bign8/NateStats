@@ -121,8 +121,9 @@ function fnStartStatsSocket(socket, domainID) {
 		var same_domain = (cbData.ref.indexOf(cbData.orig) === 0);
 		if (same_domain) newReferer = newReferer.substring(cbData.orig.length); // same domain
 		
-		// same domain regular expression, use once domain is known
+		// same domain regular expression, use once domain is known - http://dev.mysql.com/doc/refman/5.1/en/regexp.html
 		//SELECT * FROM `a_ref` WHERE `aRef` REGEXP '^http://[^/]*carroll.edu.*$'
+		//SELECT SUBSTRING(aRef,LOCATE('/',aRef,10)) as ins FROM `a_ref` WHERE `aRef` REGEXP '^http://[^/]*carroll.edu.*$'
 		
 		socket.get('sessionID', function(err, sessionID){
 			var fix = mysql.query("CALL action_insert(?, ?, ?, ?);",
