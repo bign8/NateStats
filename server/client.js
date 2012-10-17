@@ -1,11 +1,12 @@
-// http://stackoverflow.com/a/950146
-var head = document.getElementsByTagName('head')[0];
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'http://a.h1x.com:1337/socket.io/socket.io.js';
-script.onreadystatechange = startStats;
-script.onload = startStats;
-head.appendChild(script);
+(function() {
+	var head = document.getElementsByTagName('head')[0];
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = 'http://a.h1x.com:1337/socket.io/socket.io.js';
+	script.onreadystatechange = startStats;
+	script.onload = startStats;
+	head.appendChild(script);
+})();
 
 // ---- main process function ----
 var called = false;
